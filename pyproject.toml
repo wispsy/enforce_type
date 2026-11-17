@@ -1,8 +1,10 @@
 [project]
 name = "enforce-type"
-version = "0.1.0"
+version = "0.2.0"
 description = "Independent pure-Python compiled validation for ordinary type annotations."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.md"]
 authors = [
     { name = "ellainng", email = "299958882+ellainng@users.noreply.github.com" }
 ]

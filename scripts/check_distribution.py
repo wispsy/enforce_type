@@ -26,7 +26,8 @@ def metadata(raw, project):
     message = email.parser.BytesParser().parsebytes(raw)
     for key, expected in (("Name", "enforce-type"), ("Version", project["version"]),
                           ("Requires-Python", ">=3.14"), ("Summary", project["description"]),
-                          ("Description-Content-Type", "text/markdown")):
+                          ("Description-Content-Type", "text/markdown"),
+                          ("License-Expression", "MIT"), ("License-File", "LICENSE.md")):
         assert message.get_all(key) == [expected], (key, message.get_all(key))
     assert not message.get_all("Requires-Dist"), "Runtime dependencies are forbidden."
     assert message.get_payload().strip() == (ROOT / "README.md").read_text().strip()
@@ -34,7 +35,7 @@ def metadata(raw, project):
 
 def wheel_files(path, version, project):
     info = f"enforce_type-{version}.dist-info"
-    expected = {f"enforce_type/{name}" for name in MODULES} | {f"{info}/{name}" for name in ("METADATA", "WHEEL", "RECORD")}
+    expected = {f"enforce_type/{name}" for name in MODULES} | {f"{info}/{name}" for name in ("METADATA", "WHEEL", "RECORD", "licenses/LICENSE.md")}
     with zipfile.ZipFile(path) as archive:
         files = [name for name in archive.namelist() if not name.endswith("/")]
         assert len(files) == len(set(files)) and set(files) == expected, files
@@ -42,6 +43,7 @@ def wheel_files(path, version, project):
     for name in MODULES:
         assert result[f"enforce_type/{name}"] == (ROOT / "src" / "enforce_type" / name).read_bytes(), name
     metadata(result[f"{info}/METADATA"], project)
+    assert result[f"{info}/licenses/LICENSE.md"] == (ROOT / "LICENSE.md").read_bytes()
     return result
 
 
@@ -83,12 +85,13 @@ def main():
         original_wheel = wheel_files(wheel, version, project)
         prefix = f"enforce_type-{version}"
         expected = {f"{prefix}/src/enforce_type/{name}" for name in MODULES} | {
-            f"{prefix}/{name}" for name in ("pyproject.toml", "pyproject.toml.orig", "README.md", "PKG-INFO")}
+            f"{prefix}/{name}" for name in ("pyproject.toml", "pyproject.toml.orig", "README.md", "LICENSE.md", "PKG-INFO")}
         with tarfile.open(source) as archive:
             files = [m.name for m in archive.getmembers() if m.isfile()]
             assert len(files) == len(set(files)) and set(files) == expected, files
             assert all(m.isfile() or m.isdir() for m in archive.getmembers()), "Links are forbidden."
             metadata(archive.extractfile(f"{prefix}/PKG-INFO").read(), project)
+            assert archive.extractfile(f"{prefix}/LICENSE.md").read() == (ROOT / "LICENSE.md").read_bytes()
             for name in MODULES:
                 assert archive.extractfile(f"{prefix}/src/enforce_type/{name}").read() == (ROOT / "src/enforce_type" / name).read_bytes()
             for filename in ("pyproject.toml", "pyproject.toml.orig"):
