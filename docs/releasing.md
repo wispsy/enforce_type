@@ -1,17 +1,17 @@
 # Release process
 
-Distribution: `enforce-type`; import: `enforce_type`; initial version: `0.1.0`.
+Distribution: `enforce-type`; import: `enforce_type`; candidate version: `0.2.0`.
 
 1. Merge focused PRs in dependency order with fresh passing checks and verify final
    main. Preserve parent branches while any open dependent still targets them.
-2. Run `uv run --frozen python scripts/check_distribution.py --tag v0.1.0 --output-dir /path/to/new/candidate`.
+2. Run `uv run --frozen python scripts/check_distribution.py --tag v0.2.0 --output-dir /path/to/new/candidate`.
    Verify version, metadata, exact file allowlists, installed tests/examples and
    source rebuild parity. Review the printed SHA256 receipts.
 3. Confirm the PyPI Trusted Publisher uses owner `wispsy`, repository
    `enforce_type`, workflow `release.yaml` and environment `pypi`.
-4. The GitHub `pypi` environment permits only the `v0.1.0` tag. Future releases need
-   their intended tag allowed before publication.
-5. When publication is authorized, push an immutable annotated `v0.1.0` tag on the
+4. Confirm the GitHub `pypi` environment permits the exact `v0.2.0` tag before
+   publication. Retain existing released-tag policies.
+5. When publication is authorized, push an immutable annotated `v0.2.0` tag on the
    verified main commit. This starts `.github/workflows/release.yaml`.
 6. The workflow reruns checks, verifies tag/version/main agreement and exact
    distributions, then passes those artifacts to a separate OIDC publishing job.
@@ -22,5 +22,5 @@ Distribution: `enforce-type`; import: `enforce_type`; initial version: `0.1.0`.
    the publication issue and Project.
 
 Never replace released tags/files or rebuild artifacts between verification and
-upload. No application deployment is part of package publication. License terms
-remain unspecified.
+upload. No application deployment is part of package publication. Distributions
+include the repository's MIT license and verified license metadata.

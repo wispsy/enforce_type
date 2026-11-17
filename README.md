@@ -3,11 +3,11 @@
 Independent pure-Python compiled validation for ordinary type annotations.
 Python 3.14+, no runtime dependencies, no required model base class.
 
-Constraints and opt-in coercion described below are unreleased development APIs.
-PyPI 0.1.0 provides the core validation operations.
+Version 0.2.0 adds constraints and opt-in coercion to the core validation
+operations. Validation remains strict unless coercion is explicitly selected.
 
 ```sh
-python -m pip install enforce-type==0.1.0
+python -m pip install enforce-type==0.2.0
 ```
 
 ```python
@@ -30,7 +30,7 @@ assert users.load_partial({"active": False}) == {"active": False}
 Compile at application setup, then reuse the plan. Annotation resolution happens
 during compilation; value operations execute immutable nodes with their own
 invocation-local scratch state. Plans can be shared across concurrent callers.
-Version 0.1.0 provides a synchronous engine; async I/O rules and bounded async
+Version 0.2.0 provides a synchronous engine; async I/O rules and bounded async
 batches are future work. No thread or event loop starts automatically.
 
 ## Four explicit operations
